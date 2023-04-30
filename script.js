@@ -1,22 +1,27 @@
-//variables
+//Variables
 
-const rootElem = document.getElementById("root"),
-  showEpisodseRow = document.querySelector(".row"),
-  // Search input
-  searchUser = document.querySelector("#searchUser"),
-  // Show the number of episodes based on search
-  searchNumResult = document.querySelector(".epi-num"),
-  // Get an array of objects including all epiodes from episodes.js
-  allEpisodes = getAllEpisodes();
+const rootElem = document.getElementById("root");
+// Div for showing episodes
+const showEpisodseRow = document.querySelector(".row");
+// Search input
+const searchUser = document.querySelector("#searchUser");
+// Show the number of episodes based on search
+const searchNumResult = document.querySelector(".epi-num");
+// Select input
+const selectEpisodes = document.querySelector("#select-episodes");
+// Get an array of objects including all epiodes from episodes.js
+const allEpisodes = getAllEpisodes();
 
-//eventListeners
-eventlisteners();
-function eventlisteners() {
-  // display episodes on load
-  document.addEventListener("DOMContentLoaded", setup);
-  // Search episodes
-  searchUser.addEventListener("keyup", searchMovie);
-}
+//EventListeners
+
+// display episodes on load
+document.addEventListener("DOMContentLoaded", setup);
+// Search episodes
+searchUser.addEventListener("keyup", searchMovie);
+// Search specific episodes based on select
+selectEpisodes.addEventListener("change", selectMovie);
+
+//Functions
 
 // get all episodes
 function setup() {
@@ -33,9 +38,9 @@ function makePageForEpisodes(episodeList) {
         <div class="card h-100 px-0 mx-1">
         <img src="${episode.image.medium}" class="card-img-top mx-0" alt="...">
         <div class="card-body mb-4">
-        <h5 >${episode.name} - S${
-      episode.season < 10 ? "0" + episode.season : episode.season
-    }E${episode.number < 10 ? "0" + episode.number : episode.number}</h5>
+        <h5 >${episode.name} - S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.season.toString().padStart(2, "0")}</h5>
           <p >${episode.summary}</p>
         </div>
         <a href="${
@@ -46,9 +51,23 @@ function makePageForEpisodes(episodeList) {
     `;
     showEpisodseRow.innerHTML = output;
   });
+
+  // Create option for each episodes in select after loading page
+  allEpisodes.forEach((episode) => {
+    const option = document.createElement("option");
+    option.value = `S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+    option.textContent = `S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")} - ${
+      episode.name
+    }`;
+    selectEpisodes.appendChild(option);
+  });
 }
 
-// show episodes based on live search
+// Show episodes based on live search
 function searchMovie(e) {
   const selectedMovie = [];
   // Get the value of input
@@ -69,5 +88,23 @@ function searchMovie(e) {
     });
     makePageForEpisodes(selectedMovie);
     searchNumResult.textContent = ` ${selectedMovie.length}/${allEpisodes.length} `;
+  }
+}
+
+// select a specific episode
+function selectMovie(e) {
+  if (e.target.value == "allEpisodes") {
+    searchUser.value = "";
+    searchUser.disabled = false;
+    setup();
+  } else {
+    searchUser.value = "";
+    searchUser.disabled = true
+    const season = e.target.value.slice(1, 3);
+    const number = e.target.value.slice(4, 6);
+    const selectedMovie = allEpisodes.filter(
+      (episode) => episode.season == season && episode.number == number
+    );
+    makePageForEpisodes(selectedMovie);
   }
 }
