@@ -33,6 +33,7 @@ async function setup() {
 
 // Make card for all shows
 function makePageForShows(allShows) {
+  searchUser.disabled = true;
   allShows.sort((a, b) =>
     a.name.toLowerCase().localeCompare(b.name.toLowerCase())
   );
