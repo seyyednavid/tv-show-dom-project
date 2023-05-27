@@ -9,11 +9,9 @@ const searchUser = document.querySelector("#searchUser");
 const searchNumResult = document.querySelector(".epi-num");
 // Select input
 const selectEpisodes = document.querySelector("#select-episodes");
-// Get an array of objects including all epiodes from episodes.js
-const allEpisodes = getAllEpisodes();
+let allEpisodes;
 
 //EventListeners
-
 // display episodes on load
 document.addEventListener("DOMContentLoaded", setup);
 // Search episodes
@@ -22,11 +20,22 @@ searchUser.addEventListener("keyup", searchMovie);
 selectEpisodes.addEventListener("change", selectMovie);
 
 //Functions
-
-// get all episodes
-function setup() {
+// Get all episodes
+async function setup() {
+  // Get all episodes via fetch
+  allEpisodes = await getAllAvailableEpisodes();
   // call the makeForEpisode function to built card for each of episodes
   makePageForEpisodes(allEpisodes);
+}
+
+// Get all episodes via fetch
+async function getAllAvailableEpisodes() {
+  // await response of the fetch call
+  const response = await fetch("https://api.tvmaze.com/shows/82/episodes");
+  // only proceed once its resolved
+  const data = await response.json();
+  // only proceed once second promise is resolved
+  return data;
 }
 
 //make card for each episode
@@ -53,7 +62,7 @@ function makePageForEpisodes(episodeList) {
   });
 
   // Create option for each episodes in select after loading page
-  allEpisodes.forEach((episode) => {
+  episodeList.forEach((episode) => {
     const option = document.createElement("option");
     option.value = `S${episode.season
       .toString()
@@ -99,7 +108,7 @@ function selectMovie(e) {
     setup();
   } else {
     searchUser.value = "";
-    searchUser.disabled = true
+    searchUser.disabled = true;
     const season = e.target.value.slice(1, 3);
     const number = e.target.value.slice(4, 6);
     const selectedMovie = allEpisodes.filter(
