@@ -1,19 +1,18 @@
 //Variables
-
-const rootElem = document.getElementById("root");
-// Div for showing episodes
+// Div for showing episodes or movies
 const showEpisodseRow = document.querySelector(".row");
 // Search input
 const searchUser = document.querySelector("#searchUser");
 // Show the number of episodes based on search
 const searchNumResult = document.querySelector(".epi-num");
-// Select shows
+// Select related to shows
 const selectShows = document.querySelector("#select-shows");
-// Select Episodes
+// Select related to episodes
 const selectEpisodes = document.querySelector("#select-episodes");
 // get all shows
 const allShows = getAllShows();
 let allEpisodes;
+
 
 //EventListeners
 // display episodes on load
@@ -25,9 +24,11 @@ selectEpisodes.addEventListener("change", selectEpisode);
 // Search episodes
 searchUser.addEventListener("keyup", searchMovie);
 
+
 //Functions
 // Get all shows
 async function setup() {
+  // Make card for all shows and create options for select
   makePageForShows(allShows);
 }
 
@@ -130,8 +131,8 @@ function makePageForEpisodes(episodeList) {
       .padStart(2, "0")}E${episode.season.toString().padStart(2, "0")}</h5>
       <p>${
         episode.summary.split(" ").length >= 25
-          ? episode.summary.split(" ").slice(0, 25).join(" ").concat("...")
-          : episode.summary.split(" ").slice(0, 25).join(" ")
+          ? episode.summary.split(" ").slice(0, 24).join(" ").concat("...")
+          : episode.summary.split(" ").slice(0, 24).join(" ")
       }</p>
         </div>
         <a href="${
