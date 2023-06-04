@@ -9,10 +9,8 @@ const searchNumResult = document.querySelector(".epi-num");
 const selectShows = document.querySelector("#select-shows");
 // Select related to episodes
 const selectEpisodes = document.querySelector("#select-episodes");
-// get all shows
-const allShows = getAllShows();
+let allShows;
 let allEpisodes;
-
 
 //EventListeners
 // display episodes on load
@@ -24,16 +22,27 @@ selectEpisodes.addEventListener("change", selectEpisode);
 // Search episodes
 searchUser.addEventListener("keyup", searchMovie);
 
-
 //Functions
 // Get all shows
 async function setup() {
+  //get all shows with fetch
+  allShows = await getAllAvailablShows();
   // Make card for all shows and create options for select
-  makePageForShows(allShows);
+  makeCardForShows(allShows);
+}
+
+//Get all shows via fetch
+async function getAllAvailablShows() {
+  // await response of the fetch call
+  const response = await fetch("https://api.tvmaze.com/shows");
+  // only proceed once its resolved
+  const data = await response.json();
+  // only proceed once second promise is resolved
+  return data;
 }
 
 // Make card for all shows
-function makePageForShows(allShows) {
+function makeCardForShows(allShows) {
   searchUser.disabled = true;
   allShows.sort((a, b) =>
     a.name.toLowerCase().localeCompare(b.name.toLowerCase())
@@ -52,17 +61,13 @@ function makePageForShows(allShows) {
           <span class="badge text-bg-dark">Genres: ${show.genres}</span>
           <span class="badge text-bg-dark">Status: ${show.status}</span>
           <span class="badge text-bg-dark">Runtime: ${show.runtime}</span>
-          <p>${
-            show.summary.split(" ").length >= 25
-              ? show.summary.split(" ").slice(0, 25).join(" ").concat("...")
-              : show.summary.split(" ").slice(0, 25).join(" ")
-          }</p>
+          <p>${show.summary}</p>
           </div>
         </div>
       </div>
     `;
-    showEpisodseRow.innerHTML = output;
   });
+  showEpisodseRow.innerHTML = output;
 
   // Create option for each show in select after loading page
   allShows.forEach((show) => {
@@ -101,7 +106,7 @@ async function selectShow(event) {
     // Get all show's episodes
     allEpisodes = await getAllAvailableEpisodes(specificShowID);
     // make card for each episode
-    makePageForEpisodes(allEpisodes);
+    makeCardForEpisodes(allEpisodes);
   }
 }
 
@@ -118,7 +123,7 @@ async function getAllAvailableEpisodes(showId) {
 }
 
 //make card for each episode
-function makePageForEpisodes(episodeList) {
+function makeCardForEpisodes(episodeList) {
   let output = "";
   episodeList.forEach((episode) => {
     output += `
@@ -129,11 +134,7 @@ function makePageForEpisodes(episodeList) {
         <h5 >${episode.name} - S${episode.season
       .toString()
       .padStart(2, "0")}E${episode.season.toString().padStart(2, "0")}</h5>
-      <p>${
-        episode.summary.split(" ").length >= 25
-          ? episode.summary.split(" ").slice(0, 24).join(" ").concat("...")
-          : episode.summary.split(" ").slice(0, 24).join(" ")
-      }</p>
+      <p>${episode.summary}</p>
         </div>
         <a href="${
           episode.url
@@ -141,8 +142,8 @@ function makePageForEpisodes(episodeList) {
       </div>
       </div>
     `;
-    showEpisodseRow.innerHTML = output;
   });
+  showEpisodseRow.innerHTML = output;
 
   // Create option for each episodes in select after loading page
   episodeList.forEach((episode) => {
@@ -169,16 +170,16 @@ function selectEpisode(event) {
     for (let i = options.length - 1; i > 0; i--) {
       selectEpisodes.removeChild(options[i]);
     }
-    makePageForEpisodes(allEpisodes);
+    makeCardForEpisodes(allEpisodes);
   } else {
     searchUser.value = "";
     searchUser.disabled = true;
     const season = event.target.value.slice(1, 3);
     const number = event.target.value.slice(4, 6);
     const selectedMovie = allEpisodes.filter(
-      (episode) => episode.season == season && episode.number == number
+      (episode) => episode.season === season && episode.number === number
     );
-    makePageForEpisodes(selectedMovie);
+    makeCardForEpisodes(selectedMovie);
   }
 }
 
@@ -188,7 +189,7 @@ function searchMovie(e) {
   // Get the value of input
   let serchContent = e.target.value;
   if (serchContent == "") {
-    makePageForEpisodes(allEpisodes);
+    makeCardForEpisodes(allEpisodes);
     searchNumResult.textContent = "";
   } else {
     // Create case-insensitive RegExp
@@ -196,12 +197,12 @@ function searchMovie(e) {
     allEpisodes.forEach((episode) => {
       if (
         episode.name.match(searchContentInsensitive) !== null ||
-        episode.summary.slice(0, 25).match(searchContentInsensitive) !== null
+        episode.summary.match(searchContentInsensitive) !== null
       ) {
         selectedMovie.push(episode);
       }
     });
-    makePageForEpisodes(selectedMovie);
+    makeCardForEpisodes(selectedMovie);
     searchNumResult.textContent = ` ${selectedMovie.length}/${allEpisodes.length} `;
   }
 }
