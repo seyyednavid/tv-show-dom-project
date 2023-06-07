@@ -1,15 +1,14 @@
 //Variables
 // Div for showing episodes or movies
 const showEpisodseRow = document.querySelector(".row");
-// Search input
-const searchUser = document.querySelector("#searchUser");
+const searchEpisodes = document.querySelector("#searchEpisodes");
 // Show the number of episodes based on search
 const searchNumResult = document.querySelector(".epi-num");
 // Select related to shows
 const selectShows = document.querySelector("#select-shows");
 // Select related to episodes
 const selectEpisodes = document.querySelector("#select-episodes");
-let allShows;
+let sortedShows;
 let allEpisodes;
 
 //EventListeners
@@ -20,15 +19,17 @@ selectShows.addEventListener("change", selectShow);
 // Search specific episode based on select
 selectEpisodes.addEventListener("change", selectEpisode);
 // Search episodes
-searchUser.addEventListener("keyup", searchMovie);
+searchEpisodes.addEventListener("keyup", searchMovie);
 
 //Functions
 // Get all shows
 async function setup() {
   //get all shows with fetch
-  allShows = await getAllAvailablShows();
+  const allShows = await getAllAvailablShows();
+  // Sort the shows array and store the sorted version
+  sortedShows = sortShowsByName(allShows);
   // Make card for all shows and create options for select
-  makeCardForShows(allShows);
+  makeCardForShows(sortedShows);
 }
 
 //Get all shows via fetch
@@ -41,12 +42,16 @@ async function getAllAvailablShows() {
   return data;
 }
 
-// Make card for all shows
-function makeCardForShows(allShows) {
-  searchUser.disabled = true;
-  allShows.sort((a, b) =>
+// Sort shows by name
+function sortShowsByName(allShows) {
+  return allShows.sort((a, b) =>
     a.name.toLowerCase().localeCompare(b.name.toLowerCase())
   );
+}
+
+// Make card for all shows
+function makeCardForShows(allShows) {
+  searchEpisodes.disabled = true;
   let output = "";
   allShows.forEach((show) => {
     output += `
@@ -80,25 +85,24 @@ function makeCardForShows(allShows) {
 
 // Search specific Shows based on select
 async function selectShow(event) {
+  searchEpisodes.value = "";
   if (event.target.value == "allSerials") {
-    setup();
+    makeCardForShows(sortedShows);
     //Remove options from episodes's select
     const options = selectEpisodes.getElementsByTagName("option");
     for (let i = options.length - 1; i > 0; i--) {
       selectEpisodes.removeChild(options[i]);
     }
-    searchUser.value = "";
-    searchUser.disabled = true;
+    searchEpisodes.disabled = true;
   } else {
-    searchUser.value = "";
-    searchUser.disabled = false;
+    searchEpisodes.disabled = false;
     //Remove options from episodes's select
     const options = selectEpisodes.getElementsByTagName("option");
     for (let i = options.length - 1; i > 0; i--) {
       selectEpisodes.removeChild(options[i]);
     }
     // Find selected movie
-    const specificShow = allShows.find(
+    const specificShow = sortedShows.find(
       (show) => show.name === event.target.value
     );
     // Determine show's id
@@ -126,19 +130,18 @@ async function getAllAvailableEpisodes(showId) {
 function makeCardForEpisodes(episodeList) {
   let output = "";
   episodeList.forEach((episode) => {
+    const paddedEpisodeSeason = episode.season.toString().padStart(2, "0");
+    const paddedEpisodeNumber = episode.number.toString().padStart(2, "0");
+    const episodeIdentifier = `S${paddedEpisodeSeason}E${paddedEpisodeNumber}`;
     output += `
       <div class="col">
         <div class="card h-100 px-0 mx-1">
         <img src="${episode.image.medium}" class="card-img-top mx-0" alt="...">
         <div class="card-body mb-4">
-        <h5 >${episode.name} - S${episode.season
-      .toString()
-      .padStart(2, "0")}E${episode.season.toString().padStart(2, "0")}</h5>
+        <h5 >${episode.name} - S${episodeIdentifier}</h5>
       <p>${episode.summary}</p>
         </div>
-        <a href="${
-          episode.url
-        }" class="btn btn-primary" style="position:absolute; bottom:10px; left:20px; right:20px;" target="_blank">See More</a>
+        <a href="${episode.url}" class="btn btn-primary" style="position:absolute; bottom:10px; left:20px; right:20px;" target="_blank">See More</a>
       </div>
       </div>
     `;
@@ -163,8 +166,8 @@ function makeCardForEpisodes(episodeList) {
 // select a specific episode
 function selectEpisode(event) {
   if (event.target.value == "allEpisodes") {
-    searchUser.value = "";
-    searchUser.disabled = false;
+    searchEpisodes.value = "";
+    searchEpisodes.disabled = false;
     //Remove options from episodes's select
     const options = selectEpisodes.getElementsByTagName("option");
     for (let i = options.length - 1; i > 0; i--) {
@@ -172,8 +175,8 @@ function selectEpisode(event) {
     }
     makeCardForEpisodes(allEpisodes);
   } else {
-    searchUser.value = "";
-    searchUser.disabled = true;
+    searchEpisodes.value = "";
+    searchEpisodes.disabled = true;
     const season = event.target.value.slice(1, 3);
     const number = event.target.value.slice(4, 6);
     const selectedMovie = allEpisodes.filter(
@@ -194,12 +197,12 @@ function searchMovie(e) {
   } else {
     // Create case-insensitive RegExp
     let searchContentInsensitive = new RegExp(serchContent, "i");
-    allEpisodes.forEach((episode) => {
+    allEpisodes.filter((episode) => {
       if (
         episode.name.match(searchContentInsensitive) !== null ||
         episode.summary.match(searchContentInsensitive) !== null
       ) {
-        selectedMovie.push(episode);
+        return selectedMovie.push(episode);
       }
     });
     makeCardForEpisodes(selectedMovie);
