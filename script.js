@@ -138,7 +138,7 @@ function makeCardForEpisodes(episodeList) {
         <div class="card h-100 px-0 mx-1">
         <img src="${episode.image.medium}" class="card-img-top mx-0" alt="...">
         <div class="card-body mb-4">
-        <h5 >${episode.name} - S${episodeIdentifier}</h5>
+        <h5 >${episode.name} - ${episodeIdentifier}</h5>
       <p>${episode.summary}</p>
         </div>
         <a href="${episode.url}" class="btn btn-primary" style="position:absolute; bottom:10px; left:20px; right:20px;" target="_blank">See More</a>
@@ -165,8 +165,8 @@ function makeCardForEpisodes(episodeList) {
 
 // select a specific episode
 function selectEpisode(event) {
+  searchEpisodes.value = "";
   if (event.target.value == "allEpisodes") {
-    searchEpisodes.value = "";
     searchEpisodes.disabled = false;
     //Remove options from episodes's select
     const options = selectEpisodes.getElementsByTagName("option");
@@ -175,12 +175,11 @@ function selectEpisode(event) {
     }
     makeCardForEpisodes(allEpisodes);
   } else {
-    searchEpisodes.value = "";
     searchEpisodes.disabled = true;
     const season = event.target.value.slice(1, 3);
     const number = event.target.value.slice(4, 6);
     const selectedMovie = allEpisodes.filter(
-      (episode) => episode.season === season && episode.number === number
+      (episode) => episode.season == season && episode.number == number
     );
     makeCardForEpisodes(selectedMovie);
   }
