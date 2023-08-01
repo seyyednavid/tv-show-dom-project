@@ -17,18 +17,20 @@
   </head>
 
   <body>
-    <div id="root" class="container">
-      <section id="search" class="my-3">
+    <div id="root" class="mx-3">
+      <section
+        id="search"
+        class="d-flex justify-content-center align-content-center flex-wrap gap-2 my-3"
+      >
         <select
-          class="my-2 form-control-sm me-4 col-7 col-sm-5 col-md-5 col-lg-2"
+          class="form-control-sm col-7 col-sm-5 col-md-4"
           name=""
           id="select-shows"
         >
           <option value="allSerials" selected>All serials</option>
         </select>
-
         <select
-          class="my-2 form-control-sm me-4 col-7 col-sm-5 col-md-5 col-lg-2"
+          class="form-control-sm col-7 col-sm-5 col-md-4"
           name=""
           id="select-episodes"
         >
@@ -36,19 +38,18 @@
         </select>
         <input
           type="text"
-          class="my-2 input-control form-control-sm col-7 col-sm-5 col-md-5 col-lg-2"
+          class="input-control form-control-sm col-7 col-sm-5 col-md-4"
           id="searchEpisodes"
           placeholder="Search ..."
         />
-        <label class="my-2 mx-3 col-12 col-sm-6 col-md-6 col-lg-5"
-          >Displaying
-          <span class="epi-num text-warning fs-2"></span>episodes</label
+        <label class="col-7 col-sm-5 col-md-4"
+          >Displaying <span class="epi-num text-warning"></span>episodes</label
         >
       </section>
 
       <section id="show-episodes">
         <div
-          class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3"
+          class="row row-cols-1 row-cols-sm-3 d-flex justify-content-center align-items-center g-1"
         ></div>
       </section>
     </div>

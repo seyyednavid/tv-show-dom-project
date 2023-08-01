@@ -1,6 +1,6 @@
 //Variables
 // Div for showing episodes or movies
-const showEpisodseRow = document.querySelector(".row");
+const showEpisodesRow = document.querySelector(".row");
 const searchEpisodes = document.querySelector("#searchEpisodes");
 // Show the number of episodes based on search
 const searchNumResult = document.querySelector(".epi-num");
@@ -25,7 +25,7 @@ searchEpisodes.addEventListener("keyup", searchMovie);
 // Get all shows
 async function setup() {
   //get all shows with fetch
-  const allShows = await getAllAvailablShows();
+  const allShows = await getAllAvailableShows();
   // Sort the shows array and store the sorted version
   sortedShows = sortShowsByName(allShows);
   // Make card for all shows and create options for select
@@ -33,7 +33,7 @@ async function setup() {
 }
 
 //Get all shows via fetch
-async function getAllAvailablShows() {
+async function getAllAvailableShows() {
   // await response of the fetch call
   const response = await fetch("https://api.tvmaze.com/shows");
   // only proceed once its resolved
@@ -55,8 +55,8 @@ function makeCardForShows(allShows) {
   let output = "";
   allShows.forEach((show) => {
     output += `
-      <div class="col" style="height: 550px">
-        <div class="card h-100 px-0 mx-1">
+      <div class="col" style="height: 550px; width:280px">
+        <div class="card h-100 px-0">
           <img src="${
             show.image !== null ? show.image.medium : ""
           }" style="height: 250px" class="card-img-top mx-0" alt="...">
@@ -72,7 +72,7 @@ function makeCardForShows(allShows) {
       </div>
     `;
   });
-  showEpisodseRow.innerHTML = output;
+  showEpisodesRow.innerHTML = output;
 
   // Create option for each show in select after loading page
   allShows.forEach((show) => {
@@ -134,7 +134,7 @@ function makeCardForEpisodes(episodeList) {
     const paddedEpisodeNumber = episode.number.toString().padStart(2, "0");
     const episodeIdentifier = `S${paddedEpisodeSeason}E${paddedEpisodeNumber}`;
     output += `
-      <div class="col">
+      <div class="col" style="height: 420px; width:280px">
         <div class="card h-100 px-0 mx-1">
         <img src="${episode.image.medium}" class="card-img-top mx-0" alt="...">
         <div class="card-body mb-4">
@@ -146,7 +146,7 @@ function makeCardForEpisodes(episodeList) {
       </div>
     `;
   });
-  showEpisodseRow.innerHTML = output;
+  showEpisodesRow.innerHTML = output;
 
   // Create option for each episodes in select after loading page
   episodeList.forEach((episode) => {
@@ -189,13 +189,13 @@ function selectEpisode(event) {
 function searchMovie(e) {
   const selectedMovie = [];
   // Get the value of input
-  let serchContent = e.target.value;
-  if (serchContent == "") {
+  let searchContent = e.target.value;
+  if (searchContent == "") {
     makeCardForEpisodes(allEpisodes);
     searchNumResult.textContent = "";
   } else {
     // Create case-insensitive RegExp
-    let searchContentInsensitive = new RegExp(serchContent, "i");
+    let searchContentInsensitive = new RegExp(searchContent, "i");
     allEpisodes.filter((episode) => {
       if (
         episode.name.match(searchContentInsensitive) !== null ||
